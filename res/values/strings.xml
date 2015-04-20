@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">daka</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+	<string name="go_to_work">go to work</string>
+	<string name="go_off_work">go off work</string>
+	<string name="on_work_title">on work time</string>
+	<string name="off_work_title">off work time</string>
+	<string name="worked_time_title">worked time</string>
+</resources>

@@ -1,0 +1,66 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation = "vertical"
+    tools:context="com.android.daka.DakaActivity$PlaceholderFragment" >
+	<LinearLayout
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation = "horizontal"
+    >
+	    <Button
+	        android:id="@+id/btnGoWork"
+	        android:layout_weight="1"
+	    	android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"
+	    	android:text="@string/go_to_work"
+	        />
+	    <Button
+	        android:id="@+id/btnOffWork"
+	        android:layout_weight="1"
+	    	android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"
+	    	android:text="@string/go_off_work"
+	        />
+    </LinearLayout>
+    
+	<LinearLayout
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation = "vertical"
+    >
+		 <LinearLayout
+	        android:background="#ff00ff00"
+	        android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+	    	android:orientation="horizontal" >
+		    <TextView
+		        android:id="@+id/txtOnWorkTitle"
+		        android:layout_width="match_parent"
+		    	android:layout_height="wrap_content"
+		    	android:text="@string/on_work_title"
+		    	android:layout_weight="1"
+		        />
+		    <TextView
+		        android:id="@+id/txtOffWorktitle"
+		        android:layout_width="match_parent"
+		    	android:layout_height="wrap_content"
+		    	android:text="@string/off_work_title"
+		    	android:layout_weight="1"
+		        />
+		    <TextView
+		        android:id="@+id/txtWorkedTimeTitle"
+		        android:layout_width="match_parent"
+		    	android:layout_height="wrap_content"
+		    	android:text="@string/worked_time_title"
+		    	android:layout_weight="1"
+		        />
+	    </LinearLayout>
+	    <ListView
+	        android:id="@+id/listDakaInfo"
+	    	android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"
+	        />
+    </LinearLayout>
+</LinearLayout>
