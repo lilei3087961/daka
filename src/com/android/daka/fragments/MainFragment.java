@@ -2,8 +2,12 @@ package com.android.daka.fragments;
 
 import com.android.daka.R;
 import com.android.daka.adapters.MyAdapters;
+import com.android.daka.database.MyDbHelper;
+import com.android.daka.database.Tables;
+
 import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,7 +44,8 @@ public class MainFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				
+				MyDbHelper.getInstance(getActivity()).addOnWork();
+				updateListView();
 			}
 		});
 		btnOffWork = (Button)rootView.findViewById(R.id.btnOffWork);
@@ -48,14 +53,16 @@ public class MainFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				
+				MyDbHelper.getInstance(getActivity()).addOffWork();
+				updateListView();
 			}
 		});
 		listDakaInfo = (ListView)rootView.findViewById(R.id.listDakaInfo);
 		
 	}
 	void updateListView(){
-		MyAdapters mMyAdapters = new MyAdapters(this.getActivity());
-		listDakaInfo.setAdapter(mMyAdapters.getSimpleAdapter());
+		MyAdapters mMyAdapters = MyAdapters.getInstance(this.getActivity());
+		//listDakaInfo.setAdapter(mMyAdapters.getSimpleCursorAdapter()); //getDakaCursorAdapter
+		listDakaInfo.setAdapter(mMyAdapters.getDakaCursorAdapter());
 	}
 }

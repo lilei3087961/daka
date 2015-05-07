@@ -7,17 +7,34 @@ import java.util.Date;
 import java.util.HashMap;
 
 import com.android.daka.R;
-import com.android.daka.utils.MyDateUtil;
+import com.android.daka.database.MyDbHelper;
+import com.android.daka.database.Tables;
+import com.android.daka.utils.DateUtil;
 
 import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
 import android.text.format.Time;
+import android.util.Log;
 import android.widget.SimpleAdapter;
+import android.widget.SimpleCursorAdapter;
 
 public class MyAdapters {
-	private Activity mActivity;
-	public MyAdapters(Activity activity){
-		mActivity = activity;
+	private Context mContext;
+	private MyDbHelper mMyDbHelper;
+	private static final String TAG = "MyAdapters";
+	private static MyAdapters mInstance;
+	public MyAdapters(Context context){
+		mContext = context;
+		mMyDbHelper =  MyDbHelper.getInstance(context);
 	}
+	public static synchronized MyAdapters getInstance(Context context){
+		if(mInstance == null){
+			mInstance = new MyAdapters(context);
+		}
+		return mInstance;
+	}
+	
 	public SimpleAdapter getSimpleAdapter(){
 		String strDateOn = "2014-1-1 9:05:05";
 		String strDateOff = "2014-1-1 17:05:05";
@@ -28,18 +45,48 @@ public class MyAdapters {
 		HashMap<String,String> map=new HashMap<String, String>();
 		map.put("onWorkTime", strDateOn);
 		map.put("offWorkTime", strDateOff);
-		map.put("WorkedTime", MyDateUtil.getDiffTime(strDateOn, strDateOff));
+		map.put("WorkedTime", DateUtil.getDiffTime(strDateOn, strDateOff));
 		list.add(map);
 		//map.clear();
 		map=new HashMap<String, String>();
 		map.put("onWorkTime", strDateOn2);
 		map.put("offWorkTime", strDateOff2);
-		map.put("WorkedTime", MyDateUtil.getDiffTime(strDateOn2, strDateOff2));
+		map.put("WorkedTime", DateUtil.getDiffTime(strDateOn2, strDateOff2));
 		list.add(map);
 		
-		SimpleAdapter adapter=new SimpleAdapter(mActivity, list, 
+		SimpleAdapter adapter=new SimpleAdapter(mContext, list, 
 			R.layout.items_daka_info,new String[]{"onWorkTime","offWorkTime","WorkedTime"}, 
 			new int[]{R.id.txtOnWorkTime,R.id.txtOffWorkTime,R.id.txtWorkedTime});
+		return adapter;
+	}
+	/***
+	 *  only for simple db data show,
+	 * @return 
+	 */
+	public SimpleCursorAdapter getSimpleCursorAdapter(){
+		String strQuery = "select * from "+Tables.DakaInfo.TABLE_NAME
+				+" ORDER BY "+Tables.DakaInfo.COL_ID+" desc";
+		String onWorkTime = Tables.DakaInfo.COL_ON_WORK_TIME;
+		String offWorkTime = Tables.DakaInfo.COL_OFF_WORK_TIME;
+		String WorkedTime = DateUtil.getDiffTime(onWorkTime,offWorkTime);
+		Cursor cursor = mMyDbHelper.queryRaw(strQuery);
+		Log.i(TAG, "<<lilei<<getSimpleCursorAdapter getCount:"+cursor.getCount());
+		SimpleCursorAdapter adapter =  null;
+		if(cursor != null && cursor.getCount()>0){
+			adapter = new SimpleCursorAdapter(mContext,
+        		R.layout.items_daka_info, cursor,
+        		new String[]{onWorkTime,offWorkTime},
+        		new int[]{R.id.txtOnWorkTime,R.id.txtOffWorkTime},0);
+		}
+		return adapter;
+	}
+	/***
+	 * for multi db data show,
+	 * @return
+	 */
+	public DakaCursorAdapter getDakaCursorAdapter(){
+		Cursor cursor = mMyDbHelper.getDakaInfo();
+		DakaCursorAdapter adapter = new DakaCursorAdapter(mContext,cursor);
 		return adapter;
 	}
 }

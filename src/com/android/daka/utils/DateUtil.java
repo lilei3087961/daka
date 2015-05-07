@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MyDateUtil {
+public class DateUtil {
 	/***
 	 * 
 	 * @param strDateBefore ex:"2014-1-1 9:05:05"
@@ -31,4 +31,16 @@ public class MyDateUtil {
 		}
 		return strDiffTime;
 	}
+	/***
+	 * get current datetime string with specified formate 
+	 * @param strFormat ex:yyyy-mm-dd HH:mm:ss
+	 * @return
+	 */
+	public static String getCurrentDateTime(String strFormat){
+		SimpleDateFormat sdf = new SimpleDateFormat(strFormat);
+		Date dataNow = new Date(System.currentTimeMillis());
+		String str = sdf.format(dataNow);
+		return str;
+	}
+	
 }
