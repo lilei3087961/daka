@@ -25,6 +25,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	}
 	
 	public static synchronized MyDbHelper getInstance(Context context){
+	    Log.i(TAG, "<<lilei<<getInstance context:"+context+" mInstance:"+mInstance);
 		if(mInstance == null){
 			mInstance = new MyDbHelper(context);
 		}
@@ -91,28 +92,62 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	}
 	// #######################################
 	//add one on work info to db
-	public void addOnWork(){
-		String onWorkTime = DateUtil.getCurrentDateTime("yyyy-mm-dd HH:mm:ss");
-		String operateDate = DateUtil.getCurrentDateTime("yyyy-mm-dd");
+	public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final String DATE_FORMAT = "yyyy-MM-dd";
+	public boolean addOnWork(){
+		String onWorkTime = DateUtil.getCurrentDateTime(DATE_TIME_FORMAT);
+		String operateDate = DateUtil.getCurrentDateTime(DATE_FORMAT);
+		if(operateDateInDb(operateDate)){
+		    return false;
+		}
 		ContentValues cv = new ContentValues();
 		cv.put(Tables.DakaInfo.COL_ON_WORK_TIME, onWorkTime);
 		cv.put(Tables.DakaInfo.COL_OPERATE_DATE, operateDate);
-		long count = insert(Tables.DakaInfo.TABLE_NAME,cv);
-		if(count <= 0){
+		long insertNum = insert(Tables.DakaInfo.TABLE_NAME,cv);
+		Log.i(TAG, "<<lilei<<addOnWork() insertNum is:"+insertNum);
+		if(insertNum <= 0){
 			Log.i(TAG, "<<lilei<<addOnWork insert 0 row! ");
 		}
+		return true;
 	}
-	public void addOffWork(){
-		String offWorkTime = DateUtil.getCurrentDateTime("yyyy-mm-dd HH:mm:ss");
-		String operateDate = DateUtil.getCurrentDateTime("yyyy-mm-dd");
-		String where = " where "+Tables.DakaInfo.COL_OPERATE_DATE
+	public boolean addOffWork(){
+		String offWorkTime = DateUtil.getCurrentDateTime(DATE_TIME_FORMAT);
+		String operateDate = DateUtil.getCurrentDateTime(DATE_FORMAT);
+		if(!operateDateInDb(operateDate)){
+		    return false;
+		}
+		String where = Tables.DakaInfo.COL_OPERATE_DATE
 				+" = '"+operateDate+"'";
 		ContentValues cv = new ContentValues();
 		cv.put(Tables.DakaInfo.COL_OFF_WORK_TIME, offWorkTime);
-		long count = update(Tables.DakaInfo.TABLE_NAME,cv,where,null);
-		if(count <= 0){
+		long updateNum = update(Tables.DakaInfo.TABLE_NAME,cv,where,null);
+		Log.i(TAG, "<<lilei<<addOffWork updateNum is:"+updateNum);
+		if(updateNum <= 0){
 			Log.i(TAG, "<<lilei<<addOffWork update 0 row! ");
 		}
+		return true;
+	}
+	public boolean operateDateInDb(String operateDate){
+	    Cursor cursor = getDakaInfoByOperateDate(operateDate);
+        int count = cursor.getCount();
+        cursor.close();
+        Log.i(TAG, "<<lilei<<addOffWork()  operateDate:"+operateDate
+                +" account count is:"+count);
+        if(count <=0){
+            return false;
+        }else{
+            Log.i(TAG, "<<lilei<<isOpDateAdded()  operateDate:"
+                    +operateDate+" record count is:"+count);
+            return true;
+        }
+	}
+	public Cursor getDakaInfoByOperateDate(String operateDate){
+	    String strQuery = "select * from "+Tables.DakaInfo.TABLE_NAME
+	            +" where "+Tables.DakaInfo.COL_OPERATE_DATE
+	            +" = '"+operateDate+"'"
+                +" ORDER BY "+Tables.DakaInfo.COL_ID+" desc";
+        Cursor cursor = queryRaw(strQuery);
+        return cursor;
 	}
 	public Cursor getDakaInfo(){
 		String strQuery = "select * from "+Tables.DakaInfo.TABLE_NAME
