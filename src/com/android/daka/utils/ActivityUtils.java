@@ -1,5 +1,7 @@
 package com.android.daka.utils;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import android.app.ActivityManager;
@@ -10,13 +12,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
 public class ActivityUtils {
 	Context mContext;
 	static final String TAG = "ActivityUtils";
-	
+
 	public ActivityUtils(){
 	    
 	}
@@ -25,7 +28,32 @@ public class ActivityUtils {
 		mContext = context;
 	}
 	public void test(){ //for test
-	    
+		final Handler mHandler = new Handler();
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				 try {
+						final InetAddress address=InetAddress.getByName("www.baidu.com");
+						Log.i(TAG, ">>lilei>>test() address:"+address.getHostAddress()+
+								" currentThread:"+Thread.currentThread().getName());
+						mHandler.post(new Runnable() {
+							
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								alert(address.getHostAddress()+" currentThread:"+Thread.currentThread().getName());
+							}
+						});
+
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+		}).start();
+		
 //	    String packageName = "com.android.contacts";
 //	    String className = "com.android.contacts.activities.PeopleActivity";
 //	    startActivity(packageName,className);

@@ -64,7 +64,8 @@ public class MainFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-			    ReflectionUtils.test();
+			    //ReflectionUtils.test();
+				mActivityUtils.test();
 			 /*   if(mMyDbHelper.addOffWork()){
 				    updateListView();
 			    }else{
