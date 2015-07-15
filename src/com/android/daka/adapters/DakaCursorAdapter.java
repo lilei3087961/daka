@@ -6,6 +6,7 @@ import com.android.daka.utils.DateUtil;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 public class DakaCursorAdapter extends CursorAdapter {
+    static final String TAG = "DakaCursorAdapter_daka";
 	Context  mContext=null;
 	TextView txtOnWorkTime;
 	TextView txtOffWorkTime;
@@ -37,7 +39,11 @@ public class DakaCursorAdapter extends CursorAdapter {
 		
 		txtOnWorkTime.setText(strOnWorkTime);
 		txtOffWorkTime.setText(strOffWorkTime);
-		if(strOnWorkTime != null && strOffWorkTime != null)
+		txtWorkedTime.setText("");
+		Log.i(TAG, ">>strOffWorkTime:"+strOffWorkTime);
+		if(strOnWorkTime != null && strOffWorkTime != null
+		        & !"".equals(strOffWorkTime.trim())
+		        & !"".equals(strOnWorkTime.trim()))
 			txtWorkedTime.setText(DateUtil.getDiffTime(strOnWorkTime, strOffWorkTime));
 	}
 

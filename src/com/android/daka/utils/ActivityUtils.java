@@ -59,7 +59,7 @@ public class ActivityUtils {
 //	    startActivity(packageName,className);
 	}
 	
-	private void alert(String str){
+	public void alert(String str){
 	    Log.d(TAG, ">>lilei>>alert() str:"+str);
 	    Toast toast = Toast.makeText(mContext,str,Toast.LENGTH_LONG);
 	    toast.show();

@@ -9,4 +9,7 @@
 	<string name="on_work_title">on work time</string>
 	<string name="off_work_title">off work time</string>
 	<string name="worked_time_title">worked time</string>
+	<string name="alert_punched_in">you had punched in today</string>
+	<string name="alert_not_punch_in">please punch in first</string>
+	<string name="alert_punched_out">you had punched out today</string>
 </resources>

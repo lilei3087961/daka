@@ -54,8 +54,8 @@ public class MainFragment extends Fragment {
 			    if(mMyDbHelper.addOnWork()){
 			        updateListView();
 			    }else{
-	                 String str ="you had punched in today";
-	                 //mActivityUtils.alert(str);
+	                 String str =getResources().getString(R.string.alert_punched_in);
+	                 mActivityUtils.alert(str);
 			    }
 			}
 		});
@@ -65,13 +65,13 @@ public class MainFragment extends Fragment {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 			    //ReflectionUtils.test();
-				mActivityUtils.test();
-			 /*   if(mMyDbHelper.addOffWork()){
+				//mActivityUtils.test();
+			    if(mMyDbHelper.addOffWork()){
 				    updateListView();
 			    }else{
-			        String str ="please punch in first";
+			        String str =getResources().getString(R.string.alert_not_punch_in);
 				    mActivityUtils.alert(str);
-			    } //*/
+			    }
 			}
 		});
 		listDakaInfo = (ListView)rootView.findViewById(R.id.listDakaInfo);
