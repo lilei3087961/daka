@@ -5,16 +5,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import com.android.daka.Config;
+
 import android.util.Log;
 
 public class ReflectionUtils {
-    static final String TAG = "ReflectionUtils";
+    static final String TAG = Config.TAG_APP+"ReflectionUtils";
     public static void test(){
      // 利用newInstance()方法，获取构造方法的实例
      // Class的newInstance方法，仅提供默认无参的实例化方法，类似于无参的构造方法
      // Constructor的newInstance方法，提供了带参数的实例化方法，类似于含参的构造方法
         try{
-            Log.d(TAG, ">>lilei>>test 00");
+            Log.d(TAG, "test() 00");
 //            String className = "android.app.ActivityManagerNative";
 //            String methodName = "getDefault";
             String className = "com.android.internal.policy.impl.PhoneWindowManager";
@@ -35,7 +37,7 @@ public class ReflectionUtils {
             
             mMethod2.invoke(obj1,"mMethod2.invoke~~"); //*/
         }catch(Exception e){
-            Log.e(TAG, ">>lilei>>test error:"+e.toString());
+            Log.e(TAG, "test error:"+e.toString());
         }
     }
     /**
@@ -163,7 +165,7 @@ public class ReflectionUtils {
         Method[] methods = temp.getDeclaredMethods();
         //Method[] methods = temp.getMethods();
         StringBuilder sb = null;
-        Log.i(TAG, ">>lilei>>##get_Reflection_Method() methods.length:"+methods.length
+        Log.i(TAG, "get_Reflection_Method() methods.length:"+methods.length
                 +" className:"+className);
         for (int i = 0; i < methods.length; i++) {
             // 打印输出方法的修饰域
@@ -192,7 +194,7 @@ public class ReflectionUtils {
             }
             System.out.println(")");
             sb.append(")");
-            Log.i(TAG, ">>lilei>>method>>"+sb.toString());
+            Log.i(TAG, "method>>"+sb.toString());
         }
     }
     

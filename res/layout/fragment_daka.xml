@@ -14,14 +14,14 @@
 	        android:layout_weight="1"
 	    	android:layout_width="match_parent"
 	    	android:layout_height="wrap_content"
-	    	android:text="@string/go_to_work"
+	    	android:text="@string/punch_in"
 	        />
 	    <Button
 	        android:id="@+id/btnOffWork"
 	        android:layout_weight="1"
 	    	android:layout_width="match_parent"
 	    	android:layout_height="wrap_content"
-	    	android:text="@string/go_off_work"
+	    	android:text="@string/punch_out"
 	        />
     </LinearLayout>
     
@@ -41,21 +41,21 @@
 		        android:id="@+id/txtOnWorkTitle"
 		        android:layout_width="match_parent"
 		    	android:layout_height="wrap_content"
-		    	android:text="@string/on_work_title"
+		    	android:text="@string/title_on_work"
 		    	android:layout_weight="1"
 		        />
 		    <TextView
 		        android:id="@+id/txtOffWorktitle"
 		        android:layout_width="match_parent"
 		    	android:layout_height="wrap_content"
-		    	android:text="@string/off_work_title"
+		    	android:text="@string/title_off_work"
 		    	android:layout_weight="1"
 		        />
 		    <TextView
 		        android:id="@+id/txtWorkedTimeTitle"
 		        android:layout_width="match_parent"
 		    	android:layout_height="wrap_content"
-		    	android:text="@string/worked_time_title"
+		    	android:text="@string/title_worked_time"
 		    	android:layout_weight="1"
 		        />
 	    </LinearLayout>

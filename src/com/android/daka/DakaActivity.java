@@ -25,7 +25,7 @@ import android.widget.ListView;
 import android.os.Build;
 
 public class DakaActivity extends Activity {
-	static final String TAG = "<<lilei";
+	static final String TAG = Config.TAG_APP+"DakaActivity";
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

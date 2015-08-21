@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.android.daka.Config;
 import com.android.daka.R;
 import com.android.daka.database.MyDbHelper;
 import com.android.daka.database.Tables;
@@ -22,7 +23,7 @@ import android.widget.SimpleCursorAdapter;
 public class MyAdapters {
 	private Context mContext;
 	private MyDbHelper mMyDbHelper;
-	private static final String TAG = "MyAdapters";
+	static final String TAG = Config.TAG_APP+"MyAdapters";
 	private static MyAdapters mInstance;
 	public MyAdapters(Context context){
 		mContext = context;
@@ -70,7 +71,7 @@ public class MyAdapters {
 		String offWorkTime = Tables.DakaInfo.COL_OFF_WORK_TIME;
 		String WorkedTime = DateUtil.getDiffTime(onWorkTime,offWorkTime);
 		Cursor cursor = mMyDbHelper.queryRaw(strQuery);
-		Log.i(TAG, "<<lilei<<getSimpleCursorAdapter getCount:"+cursor.getCount());
+		Log.i(TAG, "getSimpleCursorAdapter() getCount:"+cursor.getCount());
 		SimpleCursorAdapter adapter =  null;
 		if(cursor != null && cursor.getCount()>0){
 			adapter = new SimpleCursorAdapter(mContext,

@@ -1,31 +1,38 @@
 package com.android.daka.fragments;
 
+import com.android.daka.Config;
 import com.android.daka.R;
 import com.android.daka.adapters.MyAdapters;
 import com.android.daka.database.MyDbHelper;
 import com.android.daka.database.Tables;
+import com.android.daka.net.NetUtils;
 import com.android.daka.utils.ActivityUtils;
 import com.android.daka.utils.ReflectionUtils;
+import com.android.daka.utils.ShellUtils;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.ContentValues;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 @SuppressLint("NewApi")
 public class MainFragment extends Fragment {
+    static final String TAG = Config.TAG_APP+"MainFragment";
 	Button btnGoWork;
 	Button btnOffWork;
 	ListView listDakaInfo;
 	MyDbHelper mMyDbHelper;
 	ActivityUtils mActivityUtils;
+	NetUtils mNetUtils;
 	public MainFragment(){
 
 	}
@@ -37,6 +44,7 @@ public class MainFragment extends Fragment {
 				false);
 	    mMyDbHelper = MyDbHelper.getInstance(getActivity());
 	    mActivityUtils = new ActivityUtils(getActivity());
+	    mNetUtils = new NetUtils(getActivity());
 		initView(rootView);
 		updateListView();
 		return rootView;
@@ -44,13 +52,14 @@ public class MainFragment extends Fragment {
 	void initView(View rootView){
 		btnGoWork = (Button)rootView.findViewById(R.id.btnGoWork);
 		if(btnGoWork == null){
-			Log.i("lilei","btnGoWork == null");
+			Log.i(TAG,"btnGoWork == null");
 			return;
 		}
 		btnGoWork.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+	             //ShellUtils.test();
 			    if(mMyDbHelper.addOnWork()){
 			        updateListView();
 			    }else{
@@ -64,8 +73,6 @@ public class MainFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-			    //ReflectionUtils.test();
-				//mActivityUtils.test();
 			    if(mMyDbHelper.addOffWork()){
 				    updateListView();
 			    }else{

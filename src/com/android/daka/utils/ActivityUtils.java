@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import com.android.daka.Config;
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ActivityNotFoundException;
@@ -18,7 +20,7 @@ import android.widget.Toast;
 
 public class ActivityUtils {
 	Context mContext;
-	static final String TAG = "ActivityUtils";
+	static final String TAG = Config.TAG_APP+"ActivityUtils";
 
 	public ActivityUtils(){
 	    
@@ -36,7 +38,7 @@ public class ActivityUtils {
 				// TODO Auto-generated method stub
 				 try {
 						final InetAddress address=InetAddress.getByName("www.baidu.com");
-						Log.i(TAG, ">>lilei>>test() address:"+address.getHostAddress()+
+						Log.i(TAG, "test() address:"+address.getHostAddress()+
 								" currentThread:"+Thread.currentThread().getName());
 						mHandler.post(new Runnable() {
 							
@@ -60,12 +62,12 @@ public class ActivityUtils {
 	}
 	
 	public void alert(String str){
-	    Log.d(TAG, ">>lilei>>alert() str:"+str);
+	    Log.d(TAG, "alert() str:"+str);
 	    Toast toast = Toast.makeText(mContext,str,Toast.LENGTH_LONG);
 	    toast.show();
 	}
 	public void alert(){
-	    Log.d(TAG, ">>lilei>>alert() ");
+	    Log.d(TAG, "alert() ");
 	    String str = "my test Reflect call ActivityUtils.alert()";
         Toast toast = Toast.makeText(mContext,str,Toast.LENGTH_LONG);
         toast.show();
@@ -83,13 +85,13 @@ public class ActivityUtils {
 	        mIntents = new Intent[]{mIntent};
 
 	        try {
-	            Log.d(TAG, ">>lilei>>startActivity className:"+className);
+	            Log.d(TAG, "startActivity className:"+className);
 	            mContext.startActivities(mIntents);
 	        }catch (ActivityNotFoundException e) {
-	            Log.d(TAG, ">>lilei>>startActivity fail !!!");
+	            Log.d(TAG, "startActivity fail !!!");
 	            return;
 	        }
-	        Log.d(TAG, ">>lilei>>startActivity success!");
+	        Log.d(TAG, "startActivity success!");
 	}
 	
     /***
@@ -189,9 +191,9 @@ public class ActivityUtils {
 	    List<RunningAppProcessInfo> infos = am.getRunningAppProcesses();
 	    for(RunningAppProcessInfo rapi : infos){
 	    	if(isPackageNameInLauncher(rapi.processName))
-	    		Log.d(TAG, ">>lilei>>in packageName:"+rapi.processName);
+	    		Log.d(TAG, "in packageName:"+rapi.processName);
 	    	else{
-	    		Log.d(TAG, ">>lilei>>not in packageName:"+rapi.processName);
+	    		Log.d(TAG, "not in packageName:"+rapi.processName);
 	    	}
 	    }
 

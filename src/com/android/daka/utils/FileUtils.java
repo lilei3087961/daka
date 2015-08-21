@@ -8,11 +8,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.android.daka.Config;
+
 import android.os.Environment;
 import android.util.Log;
 
 public class FileUtils {
-  static final String TAG = "FileUtils";
+    static final String TAG = Config.TAG_APP+"FileUtils";
   public static String sdPath =  Environment.getExternalStorageDirectory().getAbsolutePath();
   public static boolean fileExist(String path){
       File dir =new File(sdPath);

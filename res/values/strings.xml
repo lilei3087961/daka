@@ -4,12 +4,15 @@
     <string name="app_name">daka</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-	<string name="go_to_work">go to work</string>
-	<string name="go_off_work">go off work</string>
-	<string name="on_work_title">on work time</string>
-	<string name="off_work_title">off work time</string>
-	<string name="worked_time_title">worked time</string>
+	<string name="punch_in">punch in</string>
+	<string name="punch_out">punch out</string>
+	
+	<string name="title_on_work">punch in time</string>
+	<string name="title_off_work">punch out time</string>
+	<string name="title_worked_time">worked time</string>
+	
 	<string name="alert_punched_in">you had punched in today</string>
 	<string name="alert_not_punch_in">please punch in first</string>
 	<string name="alert_punched_out">you had punched out today</string>
+	
 </resources>

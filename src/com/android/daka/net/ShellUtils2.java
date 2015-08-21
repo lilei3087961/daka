@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import com.android.daka.Config;
+
 import android.util.Log;
 
 /**
@@ -28,7 +30,7 @@ import android.util.Log;
  */
 public class ShellUtils2 {
 
-    public static final String TAG ="ShellUtils2";
+    public static final String TAG =Config.TAG_APP+"ShellUtils2";
     public static final String COMMAND_SU       = "su";
     public static final String COMMAND_SH       = "sh";
     public static final String COMMAND_EXIT     = "exit\n";
@@ -135,7 +137,7 @@ public class ShellUtils2 {
 
         DataOutputStream os = null;
         try {
-            Log.i(TAG,"execCommand() 000 isRoot:"+isRoot);
+            Log.i(TAG,"execCommand() 000 isRoot:"+isRoot+" isNeedResultMsg:"+isNeedResultMsg);
             process = Runtime.getRuntime().exec(isRoot ? COMMAND_SU : COMMAND_SH);
             os = new DataOutputStream(process.getOutputStream());
             for (String command : commands) {
@@ -145,6 +147,7 @@ public class ShellUtils2 {
 
                 // donnot use os.writeBytes(commmand), avoid chinese charset error
                 os.write(command.getBytes());
+                Log.i(TAG,"execCommand():"+command);
                 os.writeBytes(COMMAND_LINE_END);
                 os.flush();
             }
@@ -160,13 +163,14 @@ public class ShellUtils2 {
                 errorResult = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                 String s;
                 while ((s = successResult.readLine()) != null) {
-                    Log.i(TAG,"execCommand() 111 line:"+s);
+                    Log.i(TAG,"execCommand() successResult:"+s);
                     successMsg.append(s);
                 }
                 while ((s = errorResult.readLine()) != null) {
-                    Log.i(TAG,"execCommand() 222 line:"+s);
+                    Log.i(TAG,"execCommand() errorResult:"+s);
                     errorMsg.append(s);
                 }
+                Log.i(TAG,"execCommand() hava root:"+process.exitValue());
             }
         } catch (IOException e) {
             Log.i(TAG,"execCommand() 333 error:"+e.toString());

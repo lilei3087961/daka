@@ -1,5 +1,6 @@
 package com.android.daka.database;
 
+import com.android.daka.Config;
 import com.android.daka.utils.DateUtil;
 
 import android.content.ContentValues;
@@ -17,7 +18,7 @@ import android.util.Log;
 public class MyDbHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "daka_db";
 	private static final int DATABASE_VERSION = 3;
-	private static final String TAG = "MyDbHelper";
+	static final String TAG = Config.TAG_APP+"MyDbHelper";
 	private static MyDbHelper mInstance;
 	
 	public MyDbHelper(Context context){
@@ -25,7 +26,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	}
 	
 	public static synchronized MyDbHelper getInstance(Context context){
-	    Log.i(TAG, "<<lilei<<getInstance context:"+context+" mInstance:"+mInstance);
+	    Log.i(TAG, "getInstance context:"+context+" mInstance:"+mInstance);
 		if(mInstance == null){
 			mInstance = new MyDbHelper(context);
 		}
@@ -35,7 +36,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase arg0) {
 		// TODO Auto-generated method stub
-		  Log.i(TAG, "<<lilei<<onCreate<<");
+		  Log.i(TAG, "onCreate");
 		  String sql="CREATE TABLE IF NOT EXISTS "+Tables.DakaInfo.TABLE_NAME+"("
 		  		+ Tables.DakaInfo.COL_ID+" integer primary key autoincrement,"
 		  		+ Tables.DakaInfo.COL_NAME+" text,"
@@ -48,19 +49,19 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
 		// TODO Auto-generated method stub
-		Log.i(TAG, "<<lilei<<onUpgrade<<");
+		Log.i(TAG, "onUpgrade");
 		String sql=" DROP TABLE IF EXISTS daka_info";  
 		arg0.execSQL(sql);
         onCreate(arg0);  
 	}
 	public Cursor queryRaw(String strQuery){
-			Log.i(TAG, "<<lilei<<queryRaw<<strQuery");
+			Log.i(TAG, "queryRaw()>>strQuery:"+strQuery);
 			SQLiteDatabase db=this.getWritableDatabase();
 			Cursor cursor = db.rawQuery(strQuery, null);
 			return cursor;
 	}
 	public long insert(String tableName,ContentValues cv){
-		Log.i(TAG, "<<lilei<<insert table:"+tableName+" valeus:"+cv.toString());
+		Log.i(TAG, "insert table:"+tableName+" valeus:"+cv.toString());
 		if(tableName.equals(Tables.DakaInfo.TABLE_NAME)){
 			SQLiteDatabase db=this.getWritableDatabase();
 			long row=db.insert(Tables.DakaInfo.TABLE_NAME, null, cv);  
@@ -69,7 +70,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
 		return -1;
 	}
 	public long delete(String tableName,String whereClause,String[] whereArgs){
-		Log.i(TAG, "<<lilei<<delete table:"+tableName+" where:"+whereClause
+		Log.i(TAG, "delete table:"+tableName+" where:"+whereClause
 				+" whereArgs:"+whereArgs);
 		if(tableName.equals(Tables.DakaInfo.TABLE_NAME)){
 			SQLiteDatabase db=this.getWritableDatabase();
@@ -80,7 +81,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	}
 	public long update(String tableName,ContentValues cv,
 			String whereClause,String[] whereArgs){
-		Log.i(TAG, "<<lilei<<update table:"+tableName+" valeus:"+cv.toString()+
+		Log.i(TAG, "update table:"+tableName+" valeus:"+cv.toString()+
 				" where:"+whereClause+" whereArgs:"+whereArgs);
 		if(tableName.equals(Tables.DakaInfo.TABLE_NAME)){
 			SQLiteDatabase db=this.getWritableDatabase();
@@ -104,9 +105,9 @@ public class MyDbHelper extends SQLiteOpenHelper {
 		cv.put(Tables.DakaInfo.COL_ON_WORK_TIME, onWorkTime);
 		cv.put(Tables.DakaInfo.COL_OPERATE_DATE, operateDate);
 		long insertNum = insert(Tables.DakaInfo.TABLE_NAME,cv);
-		Log.i(TAG, "<<lilei<<addOnWork() insertNum is:"+insertNum);
+		Log.i(TAG, "addOnWork() insertNum is:"+insertNum);
 		if(insertNum <= 0){
-			Log.i(TAG, "<<lilei<<addOnWork insert 0 row! ");
+			Log.i(TAG, "addOnWork insert 0 row! ");
 		}
 		return true;
 	}
@@ -121,9 +122,9 @@ public class MyDbHelper extends SQLiteOpenHelper {
 		ContentValues cv = new ContentValues();
 		cv.put(Tables.DakaInfo.COL_OFF_WORK_TIME, offWorkTime);
 		long updateNum = update(Tables.DakaInfo.TABLE_NAME,cv,where,null);
-		Log.i(TAG, "<<lilei<<addOffWork updateNum is:"+updateNum);
+		Log.i(TAG, "addOffWork updateNum is:"+updateNum);
 		if(updateNum <= 0){
-			Log.i(TAG, "<<lilei<<addOffWork update 0 row! ");
+			Log.i(TAG, "addOffWork update 0 row! ");
 		}
 		return true;
 	}
@@ -131,12 +132,12 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	    Cursor cursor = getDakaInfoByOperateDate(operateDate);
         int count = cursor.getCount();
         cursor.close();
-        Log.i(TAG, "<<lilei<<addOffWork()  operateDate:"+operateDate
+        Log.i(TAG, "addOffWork()  operateDate:"+operateDate
                 +" account count is:"+count);
         if(count <=0){
             return false;
         }else{
-            Log.i(TAG, "<<lilei<<isOpDateAdded()  operateDate:"
+            Log.i(TAG, "isOpDateAdded()  operateDate:"
                     +operateDate+" record count is:"+count);
             return true;
         }
@@ -148,6 +149,10 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 +" ORDER BY "+Tables.DakaInfo.COL_ID+" desc";
         Cursor cursor = queryRaw(strQuery);
         return cursor;
+	}
+	public Cursor getDakaIfoByRangeDate(String startDate,String endDate){
+	    
+	    return null;
 	}
 	public Cursor getDakaInfo(){
 		String strQuery = "select * from "+Tables.DakaInfo.TABLE_NAME
