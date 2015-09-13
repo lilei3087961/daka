@@ -86,7 +86,8 @@ public class MyAdapters {
 	 * @return
 	 */
 	public DakaCursorAdapter getDakaCursorAdapter(){
-		Cursor cursor = mMyDbHelper.getDakaInfo();
+		//Cursor cursor = mMyDbHelper.getDakaInfo();
+		Cursor cursor = mMyDbHelper.getDakaInfoRecentMonth();
 		DakaCursorAdapter adapter = new DakaCursorAdapter(mContext,cursor);
 		return adapter;
 	}

@@ -93,11 +93,10 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	}
 	// #######################################
 	//add one on work info to db
-	public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	public static final String DATE_FORMAT = "yyyy-MM-dd";
+
 	public boolean addOnWork(){
-		String onWorkTime = DateUtil.getCurrentDateTime(DATE_TIME_FORMAT);
-		String operateDate = DateUtil.getCurrentDateTime(DATE_FORMAT);
+		String onWorkTime = DateUtil.getCurrentDateTime(DateUtil.DATE_TIME_FORMAT);
+		String operateDate = DateUtil.getCurrentDateTime(DateUtil.DATE_FORMAT);
 		if(operateDateInDb(operateDate)){
 		    return false;
 		}
@@ -112,8 +111,8 @@ public class MyDbHelper extends SQLiteOpenHelper {
 		return true;
 	}
 	public boolean addOffWork(){
-		String offWorkTime = DateUtil.getCurrentDateTime(DATE_TIME_FORMAT);
-		String operateDate = DateUtil.getCurrentDateTime(DATE_FORMAT);
+		String offWorkTime = DateUtil.getCurrentDateTime(DateUtil.DATE_TIME_FORMAT);
+		String operateDate = DateUtil.getCurrentDateTime(DateUtil.DATE_FORMAT);
 		if(!operateDateInDb(operateDate)){
 		    return false;
 		}
@@ -150,15 +149,36 @@ public class MyDbHelper extends SQLiteOpenHelper {
         Cursor cursor = queryRaw(strQuery);
         return cursor;
 	}
+	/***
+	 * 获取当前月份的打卡信息
+	 * @return
+	 */
+	public Cursor getDakaInfoRecentMonth(){
+		String firstDayOfMonth = DateUtil.getCurrentMonth1DateTime();
+		Log.i(TAG, "getDakaInfoRecentMonth() firstDayOfMonth:"+firstDayOfMonth);
+	    String strQuery = "select * from "+Tables.DakaInfo.TABLE_NAME
+	            +" where "+Tables.DakaInfo.COL_OPERATE_DATE
+	            +" >= '"+firstDayOfMonth+"'"
+                +" ORDER BY "+Tables.DakaInfo.COL_ID+" desc";
+        Cursor cursor = queryRaw(strQuery);
+        Log.i(TAG, "getDakaInfoRecentMonth() count:"+cursor.getCount());
+        return cursor;
+	}
 	public Cursor getDakaIfoByRangeDate(String startDate,String endDate){
 	    
 	    return null;
 	}
+	@Deprecated //use getDakaInfoAll() instead
 	public Cursor getDakaInfo(){
 		String strQuery = "select * from "+Tables.DakaInfo.TABLE_NAME
 				+" ORDER BY "+Tables.DakaInfo.COL_ID+" desc";
 		Cursor cursor = queryRaw(strQuery);
 		return cursor;
 	}
-	
+	public Cursor getDakaInfoAll(){
+		String strQuery = "select * from "+Tables.DakaInfo.TABLE_NAME
+				+" ORDER BY "+Tables.DakaInfo.COL_ID+" desc";
+		Cursor cursor = queryRaw(strQuery);
+		return cursor;
+	}
 }
