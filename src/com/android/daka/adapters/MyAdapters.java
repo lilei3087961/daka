@@ -10,7 +10,7 @@ import com.android.daka.Config;
 import com.android.daka.R;
 import com.android.daka.database.MyDbHelper;
 import com.android.daka.database.Tables;
-import com.android.daka.utils.DateUtil;
+import com.android.daka.utils.DateUtils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -46,13 +46,13 @@ public class MyAdapters {
 		HashMap<String,String> map=new HashMap<String, String>();
 		map.put("onWorkTime", strDateOn);
 		map.put("offWorkTime", strDateOff);
-		map.put("WorkedTime", DateUtil.getDiffTime(strDateOn, strDateOff));
+		map.put("WorkedTime", DateUtils.getDiffTime(strDateOn, strDateOff));
 		list.add(map);
 		//map.clear();
 		map=new HashMap<String, String>();
 		map.put("onWorkTime", strDateOn2);
 		map.put("offWorkTime", strDateOff2);
-		map.put("WorkedTime", DateUtil.getDiffTime(strDateOn2, strDateOff2));
+		map.put("WorkedTime", DateUtils.getDiffTime(strDateOn2, strDateOff2));
 		list.add(map);
 		
 		SimpleAdapter adapter=new SimpleAdapter(mContext, list, 
@@ -69,7 +69,7 @@ public class MyAdapters {
 				+" ORDER BY "+Tables.DakaInfo.COL_ID+" desc";
 		String onWorkTime = Tables.DakaInfo.COL_ON_WORK_TIME;
 		String offWorkTime = Tables.DakaInfo.COL_OFF_WORK_TIME;
-		String WorkedTime = DateUtil.getDiffTime(onWorkTime,offWorkTime);
+		String WorkedTime = DateUtils.getDiffTime(onWorkTime,offWorkTime);
 		Cursor cursor = mMyDbHelper.queryRaw(strQuery);
 		Log.i(TAG, "getSimpleCursorAdapter() getCount:"+cursor.getCount());
 		SimpleCursorAdapter adapter =  null;

@@ -3,7 +3,7 @@ package com.android.daka.adapters;
 import com.android.daka.Config;
 import com.android.daka.R;
 import com.android.daka.database.Tables;
-import com.android.daka.utils.DateUtil;
+import com.android.daka.utils.DateUtils;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -57,7 +57,7 @@ public class DakaCursorAdapter extends CursorAdapter {
 		if(strOnWorkTime != null && strOffWorkTime != null
 		        && !"".equals(strOffWorkTime.trim())
 		        && !"".equals(strOnWorkTime.trim()))
-		    holder.txtWorkedTime.setText(DateUtil.getDiffTime(strOnWorkTime, strOffWorkTime));
+		    holder.txtWorkedTime.setText(DateUtils.getDiffTime(strOnWorkTime, strOffWorkTime));
 	}
 
 	@Override

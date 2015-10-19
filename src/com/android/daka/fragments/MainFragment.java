@@ -6,14 +6,18 @@ import com.android.daka.adapters.MyAdapters;
 import com.android.daka.database.MyDbHelper;
 import com.android.daka.database.Tables;
 import com.android.daka.net.NetUtils;
+import com.android.daka.net.NetworkReceiver;
 import com.android.daka.utils.ActivityUtils;
+import com.android.daka.utils.FileUtils;
 import com.android.daka.utils.ReflectionUtils;
 import com.android.daka.utils.ShellUtils;
+import com.android.daka.utils.SystemUtils;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,6 +54,13 @@ public class MainFragment extends Fragment {
 		return rootView;
 	}
 	void initView(View rootView){
+	    //for test begin
+	    Log.i(TAG, "initView registe broadcast");
+	    NetworkReceiver mNetworkReceiver = new NetworkReceiver();
+	    IntentFilter filter = new IntentFilter();
+	    filter.addAction("com.launcher.action");
+	    getActivity().registerReceiver(mNetworkReceiver, filter);
+	    //for test end
 		btnGoWork = (Button)rootView.findViewById(R.id.btnGoWork);
 		if(btnGoWork == null){
 			Log.i(TAG,"btnGoWork == null");
@@ -60,6 +71,10 @@ public class MainFragment extends Fragment {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 	             //ShellUtils.test();
+			    SystemUtils.getDisplayMetrics(getActivity());
+			    //FileUtils.test(getActivity());
+			    if(true)
+			        return;
 			    if(mMyDbHelper.addOnWork()){
 			        updateListView();
 			    }else{
@@ -89,4 +104,8 @@ public class MainFragment extends Fragment {
 		//listDakaInfo.setAdapter(mMyAdapters.getSimpleCursorAdapter()); //getDakaCursorAdapter
 		listDakaInfo.setAdapter(mMyAdapters.getDakaCursorAdapter());
 	}
+	//add by lilei for 悬浮框 test begin
+	
+	//add by lilei for 悬浮框 test end
+	
 }

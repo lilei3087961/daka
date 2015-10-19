@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DateUtil {
+public class DateUtils {
 	public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";//MM month; mm minutes;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	/***

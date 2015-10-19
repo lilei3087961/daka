@@ -5,6 +5,13 @@
     android:versionName="1.0" >
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <!--   <uses-permission android:name="android.permission.INSTALL_PACKAGES" />      -->
+    <!--only set below property can use this permission
+    android:sharedUserId="android.uid.systemui"
+    -->
+
+    
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="19" />
@@ -23,6 +30,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+       <!--     <receiver
+            android:name="com.android.daka.net.NetworkReceiver" 
+            >
+            <intent-filter >
+            <action android:name="com.launcher.action"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>            
+
+        </receiver>
+            -->
     </application>
 
 </manifest>

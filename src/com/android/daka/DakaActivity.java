@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.daka.adapters.MyAdapters;
+import com.android.daka.fragments.DragGridFragment;
 import com.android.daka.fragments.MainFragment;
 import com.android.daka.fragments.MyFragments;
 import com.android.daka.utils.ActivityUtils;
@@ -34,7 +35,7 @@ public class DakaActivity extends Activity {
 		setContentView(R.layout.activity_daka);
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-					.add(R.id.container, new MainFragment()).commit();
+					.add(R.id.container, new DragGridFragment()).commit();
 		}
 		ActivityUtils mActivityUtils = new ActivityUtils(this);
 //		mActivityUtils.getRunningAppProcesses();

@@ -1,7 +1,7 @@
 package com.android.daka.database;
 
 import com.android.daka.Config;
-import com.android.daka.utils.DateUtil;
+import com.android.daka.utils.DateUtils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -95,8 +95,8 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	//add one on work info to db
 
 	public boolean addOnWork(){
-		String onWorkTime = DateUtil.getCurrentDateTime(DateUtil.DATE_TIME_FORMAT);
-		String operateDate = DateUtil.getCurrentDateTime(DateUtil.DATE_FORMAT);
+		String onWorkTime = DateUtils.getCurrentDateTime(DateUtils.DATE_TIME_FORMAT);
+		String operateDate = DateUtils.getCurrentDateTime(DateUtils.DATE_FORMAT);
 		if(operateDateInDb(operateDate)){
 		    return false;
 		}
@@ -111,8 +111,8 @@ public class MyDbHelper extends SQLiteOpenHelper {
 		return true;
 	}
 	public boolean addOffWork(){
-		String offWorkTime = DateUtil.getCurrentDateTime(DateUtil.DATE_TIME_FORMAT);
-		String operateDate = DateUtil.getCurrentDateTime(DateUtil.DATE_FORMAT);
+		String offWorkTime = DateUtils.getCurrentDateTime(DateUtils.DATE_TIME_FORMAT);
+		String operateDate = DateUtils.getCurrentDateTime(DateUtils.DATE_FORMAT);
 		if(!operateDateInDb(operateDate)){
 		    return false;
 		}
@@ -154,7 +154,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
 	 * @return
 	 */
 	public Cursor getDakaInfoRecentMonth(){
-		String firstDayOfMonth = DateUtil.getCurrentMonth1DateTime();
+		String firstDayOfMonth = DateUtils.getCurrentMonth1DateTime();
 		Log.i(TAG, "getDakaInfoRecentMonth() firstDayOfMonth:"+firstDayOfMonth);
 	    String strQuery = "select * from "+Tables.DakaInfo.TABLE_NAME
 	            +" where "+Tables.DakaInfo.COL_OPERATE_DATE
