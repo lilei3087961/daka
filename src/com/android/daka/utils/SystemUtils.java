@@ -8,6 +8,11 @@ import android.util.Log;
 
 public class SystemUtils {
     static final String TAG = Config.TAG_APP+"SystemUtils";
+    static Context mContext;
+    static float sScreenDensity = -1;
+    public static void initContext(Context context){
+        mContext = context;
+    }
     public static String getDisplayMetrics(Context cx) {
         String str = "";
         DisplayMetrics dm = new DisplayMetrics();
@@ -27,5 +32,12 @@ public class SystemUtils {
         Log.i(TAG, "str is:"+str);
         return str;
 }
+    public static float getScreenDensity() {
+        if(sScreenDensity == -1)
+            sScreenDensity = mContext.getResources().getDisplayMetrics().density;
+        return sScreenDensity;
+    }
+
+    
     
 }

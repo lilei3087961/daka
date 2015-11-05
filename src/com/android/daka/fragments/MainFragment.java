@@ -18,13 +18,18 @@ import android.app.Fragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,6 +40,7 @@ public class MainFragment extends Fragment {
 	Button btnOffWork;
 	ListView listDakaInfo;
 	MyDbHelper mMyDbHelper;
+	ViewGroup mRootView;
 	ActivityUtils mActivityUtils;
 	NetUtils mNetUtils;
 	public MainFragment(){
@@ -49,6 +55,7 @@ public class MainFragment extends Fragment {
 	    mMyDbHelper = MyDbHelper.getInstance(getActivity());
 	    mActivityUtils = new ActivityUtils(getActivity());
 	    mNetUtils = new NetUtils(getActivity());
+	    mRootView = (ViewGroup) rootView;
 		initView(rootView);
 		updateListView();
 		return rootView;
@@ -71,7 +78,7 @@ public class MainFragment extends Fragment {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 	             //ShellUtils.test();
-			    SystemUtils.getDisplayMetrics(getActivity());
+			    showImage(getActivity());
 			    //FileUtils.test(getActivity());
 			    if(true)
 			        return;
@@ -88,6 +95,9 @@ public class MainFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+			    moveImage();
+			    if(true)
+                    return;
 			    if(mMyDbHelper.addOffWork()){
 				    updateListView();
 			    }else{
@@ -105,7 +115,28 @@ public class MainFragment extends Fragment {
 		listDakaInfo.setAdapter(mMyAdapters.getDakaCursorAdapter());
 	}
 	//add by lilei for 悬浮框 test begin
-	
+	ImageView mImageView;
+	LinearLayout.LayoutParams mViewGroupLayoutParams;
+	public void showImage(Context context){
+	    mImageView = new ImageView(context);
+	    mImageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_launcher));
+	    Log.i(TAG, "showImage mRootView.getLayoutParams():"+mRootView.getLayoutParams());
+	    mViewGroupLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+	    mViewGroupLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
+	    mRootView.addView(mImageView,mViewGroupLayoutParams);
+	}
+	public void moveImage(){
+	    Log.i(TAG,"moveImage getX:"+mImageView.getX()+" getY:"+mImageView.getY()
+	            +" getTop:"+mImageView.getTop());
+	    int x = (int)mImageView.getX();
+	    int y = (int)mImageView.getY()+10;
+	    
+	    //mImageView.setTranslationX(x);
+	    mImageView.setTranslationY(y);
+	}
+	public void hideImage(){
+    
+	}
 	//add by lilei for 悬浮框 test end
 	
 }

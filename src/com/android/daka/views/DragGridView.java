@@ -1,39 +1,56 @@
 package com.android.daka.views;
 
+import com.android.daka.Config;
+import com.android.daka.fragments.DragGridFragment;
+import com.android.daka.launcher.HolographicOutlineHelper;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.Region.Op;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.View.OnLongClickListener;
 
 /**
- * @blog http://blog.csdn.net/xiaanming 
+ * 参考 blog  http://blog.csdn.net/xiaanming 
  * 
- * @author xiaanming
+ *
  *
  */
 @SuppressLint("NewApi")
-public class DragGridView extends GridView{
+public class DragGridView extends GridView implements OnLongClickListener{
+    final boolean SHOW_DROP_LOCATION = false; //是否显示占位图标轮廓
+    public static final boolean SCROLL_VERTICAL = false; //是否纵向滚动
+    public static final boolean HORIZONTAL_LONG = false; //首先 SCROLL_VERTICAL为false，其次 水平图标个数要很多才能设置为true(未实现)
     /**
      * DragGridView的item长按响应的时间， 默认是1000毫秒，也可以自行设置
      */
     private long dragResponseMS = 1000;
-    
+    static final String TAG = Config.TAG_APP+"DragGridView";
     /**
      * 是否可以拖拽，默认不可以
      */
-    private boolean isDrag = false;
+    public static boolean isDrag = false;
     
     private int mDownX;
     private int mDownY;
@@ -54,6 +71,8 @@ public class DragGridView extends GridView{
      */
     private ImageView mDragImageView;
     
+    private ImageView mDropLocationImageView;
+    
     /**
      * 震动器
      */
@@ -64,12 +83,12 @@ public class DragGridView extends GridView{
      * item镜像的布局参数
      */
     private WindowManager.LayoutParams mWindowLayoutParams;
-    
+    private LinearLayout.LayoutParams mViewGroupLayoutParams;
     /**
      * 我们拖拽的item对应的Bitmap
      */
     private Bitmap mDragBitmap;
-    
+    Context mContext;
     /**
      * 按下的点到所在item的上边缘的距离
      */
@@ -94,13 +113,26 @@ public class DragGridView extends GridView{
      * 状态栏的高度
      */
     private int mStatusHeight; 
+    /**
+     *  横向滚动模式
+     * DragGridView自动向左边滚动的边界值
+     */
+    private int mLeftScrollBorder;
     
     /**
+     *  横向滚动模式
+     * DragGridView自动向又滚动的边界值
+     */
+    private int mRightScrollBorder;
+    
+    /**
+     * 纵向滚动模式
      * DragGridView自动向下滚动的边界值
      */
     private int mDownScrollBorder;
     
     /**
+     * 纵向滚动模式
      * DragGridView自动向上滚动的边界值
      */
     private int mUpScrollBorder;
@@ -115,7 +147,10 @@ public class DragGridView extends GridView{
      */
     private OnChanageListener onChanageListener;
     
-    
+    int mScreenWidth;
+    int mScreenHeight;
+    float MOVE_THRESHOLD = 100;
+    int mCurrentPage = 0;
     
     public DragGridView(Context context) {
         this(context, null);
@@ -127,6 +162,12 @@ public class DragGridView extends GridView{
 
     public DragGridView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mContext = context;
+        DisplayMetrics dm = new DisplayMetrics();
+        dm = context.getApplicationContext().getResources().getDisplayMetrics();
+        mScreenWidth = dm.widthPixels;
+        mScreenHeight = dm.heightPixels;
+        mGestureDetector = new GestureDetector(context, new DrapGestureListener());
         mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         mStatusHeight = getStatusHeight(context); //获取状态栏的高度
@@ -140,14 +181,75 @@ public class DragGridView extends GridView{
         @Override
         public void run() {
             isDrag = true; //设置可以拖拽
+            Log.i(TAG, "mLongClickRunnable.run() isDrag = true");
             mVibrator.vibrate(50); //震动一下
             mStartDragItemView.setVisibility(View.INVISIBLE);//隐藏该item
-            
+            //绘制outline add by lilei begin
+            if(SHOW_DROP_LOCATION){
+                createDropLocationView();//init mDropLocationImageView
+                showDropLocationView();
+            }
+            //add by lilei end
             //根据我们按下的点显示item镜像
             createDragImage(mDragBitmap, mDownX, mDownY);
         }
     };
-    
+    //add by lilei begin
+    private final HolographicOutlineHelper mOutlineHelper = new HolographicOutlineHelper();
+    private final Rect mTempRect = new Rect();
+    private Bitmap mDragOutline = null;
+    //显示外框线图形
+    private void createDropLocationView(){
+        final Canvas canvas = new Canvas();
+        mDragOutline = createDragOutline(mStartDragItemView,canvas,2);
+        if(mDropLocationImageView == null)
+            mDropLocationImageView = new ImageView(getContext());
+        mDropLocationImageView.setImageBitmap(mDragOutline);
+    }
+    private void showDropLocationView(){
+        if(mDropLocationImageView == null)
+            createDropLocationView();
+        View view = getChildAt(mDragPosition - getFirstVisiblePosition());
+        float x = view.getX();
+        float y = view.getY();
+        Log.i(TAG, "showDropLocationView view.getX():"+view.getX()+" view.getY():"+view.getY());
+        mOnDragListener.onShowDropLocationView(mDropLocationImageView, (int)x, (int)y);
+    }
+    private void hideDropLocationView(){
+        mOnDragListener.onHideDropLocationView(mDropLocationImageView);
+    }
+    private void swapDropLocationView(){
+        hideDropLocationView();
+        showDropLocationView();
+    }
+    /**
+     * Returns a new bitmap to be used as the object outline, e.g. to visualize the drop location.
+     * Responsibility for the bitmap is transferred to the caller.
+     */
+    private Bitmap createDragOutline(View v, Canvas canvas, int padding) {
+        final int outlineColor = getResources().getColor(android.R.color.white);
+        final Bitmap b = Bitmap.createBitmap(
+                v.getWidth() + padding, v.getHeight() + padding, Bitmap.Config.ARGB_8888);
+
+        canvas.setBitmap(b);
+        drawDragView(v, canvas, padding, true);
+        mOutlineHelper.applyMediumExpensiveOutlineWithBlur(b, canvas, outlineColor, outlineColor);
+        canvas.setBitmap(null);
+        return b;
+    }
+    private void drawDragView(View v, Canvas destCanvas, int padding, boolean pruneToDrawable) {
+        final Rect clipRect = mTempRect;
+        v.getDrawingRect(clipRect);
+
+        boolean textVisible = false;
+
+        destCanvas.save();
+        destCanvas.translate(-v.getScrollX() + padding / 2, -v.getScrollY() + padding / 2);
+        destCanvas.clipRect(clipRect, Op.REPLACE);
+        v.draw(destCanvas);
+        destCanvas.restore();
+    }
+    //add by lilei end
     /**
      * 设置回调接口
      * @param onChanageListener
@@ -163,13 +265,17 @@ public class DragGridView extends GridView{
     public void setDragResponseMS(long dragResponseMS) {
         this.dragResponseMS = dragResponseMS;
     }
-
+    public void alert(String txt){
+        Toast.makeText(getContext(), txt, Toast.LENGTH_LONG).show();
+    }
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch(ev.getAction()){
         case MotionEvent.ACTION_DOWN:
             //使用Handler延迟dragResponseMS执行mLongClickRunnable
-            mHandler.postDelayed(mLongClickRunnable, dragResponseMS);
+            Log.i(TAG, "dispatchTouchEvent>> ACTION_DOWN");
+            //if(!DragHorizontalScrollView.isMove)
+            //mHandler.postDelayed(mLongClickRunnable, dragResponseMS);
             
             mDownX = (int) ev.getX();
             mDownY = (int) ev.getY();
@@ -183,19 +289,38 @@ public class DragGridView extends GridView{
             
             //根据position获取该item所对应的View
             mStartDragItemView = getChildAt(mDragPosition - getFirstVisiblePosition());
-            
+            boolean is_BUTTON_SECONDARY = (ev.getButtonState() & MotionEvent.BUTTON_SECONDARY) != 0;
+            Log.i(TAG, "dispatchTouchEvent>> mDragPosition:"+mDragPosition+" getFirstVisiblePosition():"
+                    +getFirstVisiblePosition()+" mDownX:"+mDownX+" mDownY:"+mDownY
+                    +" ev.getRawX():"+ev.getRawX()+" ev.getRawY():"+ev.getRawY()
+                    +" is_BUTTON_SECONDARY:"+is_BUTTON_SECONDARY
+                    +" ev.getButtonState():"+ev.getButtonState());
+            /*alert("dispatchTouchEvent>> mDragPosition:"+mDragPosition+" getFirstVisiblePosition():"
+                    +getFirstVisiblePosition()+" mDownX:"+mDownX+" mDownY:"+mDownY
+                    +" ev.getRawX():"+ev.getRawX()+" ev.getRawY():"+ev.getRawY()
+                    +" is_BUTTON_SECONDARY:"+is_BUTTON_SECONDARY
+                    +" ev.getButtonState():"+ev.getButtonState()); */
             //下面这几个距离大家可以参考我的博客上面的图来理解下
             mPoint2ItemTop = mDownY - mStartDragItemView.getTop();
             mPoint2ItemLeft = mDownX - mStartDragItemView.getLeft();
             
             mOffset2Top = (int) (ev.getRawY() - mDownY);
             mOffset2Left = (int) (ev.getRawX() - mDownX);
+            //add by lilei begin
+            //获取DragGridView自动向左边滚动的偏移量，小于这个值，DragGridView向左滚动
+            mLeftScrollBorder = mScreenWidth/8;
+            //获取DragGridView自动向右边滚动的偏移量，小于这个值，DragGridView向右滚动
+            mRightScrollBorder = mScreenWidth * 7/8;
             
+            //add by lilei end
             //获取DragGridView自动向上滚动的偏移量，小于这个值，DragGridView向下滚动
             mDownScrollBorder = getHeight() /4;
             //获取DragGridView自动向下滚动的偏移量，大于这个值，DragGridView向上滚动
             mUpScrollBorder = getHeight() * 3/4;
-            
+            Log.i(TAG, "dispatchTouchEvent>>mDownScrollBorder:"+mDownScrollBorder+" mUpScrollBorder:"+mUpScrollBorder
+                    +" mLeftScrollBorder:"+mLeftScrollBorder+" mRightScrollBorder:"+mRightScrollBorder
+                    +" getWidth():"+getWidth()+" getHeight():"+getHeight()+" mScreenWidth:"+mScreenWidth
+                    +" mScreenHeight:"+mScreenHeight);
             
             
             //开启mDragItemView绘图缓存
@@ -217,11 +342,36 @@ public class DragGridView extends GridView{
             }
             break;
         case MotionEvent.ACTION_UP:
+            Log.i(TAG, "dispatchTouchEvent>> ACTION_UP");
             mHandler.removeCallbacks(mLongClickRunnable);
             mHandler.removeCallbacks(mScrollRunnable);
+            //for test pop begin
+            int upX = (int)ev.getX();
+            int upY = (int) ev.getY();
+            if(isTouchInItem(mStartDragItemView, upX, upY)){
+                Log.i(TAG, "up this position***** isDrag:"+isDrag);
+            }
+            int diff = upX - mDownX;
+            Log.i(TAG, "dispatchTouchEvent>> ACTION_UP upX:"+upX+" mDownX:"+mDownX
+                    +" diff:"+diff+" isDrag:"+isDrag);
+            if(!isDrag){
+                if(diff> MOVE_THRESHOLD && mCurrentPage > 0){
+                    mOnDragListener.onChangePage(mCurrentPage, mCurrentPage-1);
+                    mCurrentPage--;
+                }else if(diff < -MOVE_THRESHOLD && mCurrentPage< DragGridFragment.pageCount-1){
+                    mOnDragListener.onChangePage(mCurrentPage, mCurrentPage+1);
+                    mCurrentPage++;
+                }
+            }
+            if(SHOW_DROP_LOCATION)
+                hideDropLocationView();
+            //for test pop end
             break;
         }
-        return super.dispatchTouchEvent(ev);
+//        Log.i(TAG,"dispatchTouchEvent ev.getAction():"+parseAction(ev));
+        boolean flag = super.dispatchTouchEvent(ev); 
+        //Log.i(TAG," flag:"+flag);
+        return flag;
     }
 
     
@@ -233,6 +383,8 @@ public class DragGridView extends GridView{
      * @return
      */
     private boolean isTouchInItem(View dragView, int x, int y){
+        if(dragView == null)
+            return false;
         int leftOffset = dragView.getLeft();
         int topOffset = dragView.getTop();
         if(x < leftOffset || x > leftOffset + dragView.getWidth()){
@@ -245,12 +397,39 @@ public class DragGridView extends GridView{
         
         return true;
     }
-    
+    //for test begin
+    public String parseAction(MotionEvent ev){
+        String action = null;
+        switch(ev.getAction()){
+            case MotionEvent.ACTION_MOVE:
+                action = "ACTION_MOVE";
+                break;
+            case MotionEvent.ACTION_DOWN:
+                action = "ACTION_DOWN";
+                break;
+            case MotionEvent.ACTION_UP:
+                action = "ACTION_UP";
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                action = "ACTION_CANCEL";
+                break;
+            default:
+                action = ""+ev.getAction();
+                break;
+        }
+        return action;
+    }
     
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        //for test begin
+        mGestureDetector.onTouchEvent(ev);//
+        String action = parseAction(ev);
+//        Log.i(TAG, "onTouchEvent 111 ev.getAction():"+action);
+        //for test end 
         if(isDrag && mDragImageView != null){
+            Log.i(TAG, "onTouchEvent 222");
             switch(ev.getAction()){
             case MotionEvent.ACTION_MOVE:
                 moveX = (int) ev.getX();
@@ -291,7 +470,22 @@ public class DragGridView extends GridView{
           
         mDragImageView = new ImageView(getContext());  
         mDragImageView.setImageBitmap(bitmap);  
-        mWindowManager.addView(mDragImageView, mWindowLayoutParams);  
+        //mWindowManager.addView(mDragImageView, mWindowLayoutParams);
+        //add by lilei begin
+        //LinearLayout.LayoutParams
+        Log.i(TAG, "downX:"+downX+" downY:"+downY+" mPoint2ItemLeft:"+mPoint2ItemLeft+
+                " mOffset2Left:"+mOffset2Left+" mPoint2ItemTop:"+mPoint2ItemTop+" mOffset2Top:"+mOffset2Top+
+                " mStatusHeight:"+mStatusHeight);
+        mViewGroupLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+        mViewGroupLayoutParams.gravity = Gravity.TOP | Gravity.LEFT; 
+        //mDragImageView.setTranslationX(downX - mPoint2ItemLeft + mOffset2Left);
+        //mDragImageView.setTranslationY(downY - mPoint2ItemTop + mOffset2Top - mStatusHeight);
+        int x = downX - mPoint2ItemLeft + mOffset2Left;
+        int y = downY - mPoint2ItemTop;
+        //((ViewGroup)this).addView(mDragImageView);
+        mOnDragListener.onDragStart(mDragImageView, x, y);
+        //((LinearLayout)this.getParent()).addView(mDragImageView);
+        //add by lilei end
     }
     
     /**
@@ -299,7 +493,8 @@ public class DragGridView extends GridView{
      */
     private void removeDragImage(){
         if(mDragImageView != null){
-            mWindowManager.removeView(mDragImageView);
+            //mWindowManager.removeView(mDragImageView);
+            mOnDragListener.onDragEnd(mDragImageView, 0, 0);
             mDragImageView = null;
         }
     }
@@ -312,7 +507,12 @@ public class DragGridView extends GridView{
     private void onDragItem(int moveX, int moveY){
         mWindowLayoutParams.x = moveX - mPoint2ItemLeft + mOffset2Left;
         mWindowLayoutParams.y = moveY - mPoint2ItemTop + mOffset2Top - mStatusHeight;
-        mWindowManager.updateViewLayout(mDragImageView, mWindowLayoutParams); //更新镜像的位置
+        //modify by lilei begin
+        //mWindowManager.updateViewLayout(mDragImageView, mWindowLayoutParams); //更新镜像的位置
+        int x = moveX - mPoint2ItemLeft + mOffset2Left;
+        int y = moveY - mPoint2ItemTop;
+        mOnDragListener.onDragMove(mDragImageView, x, y);
+        //modify by lilei end
         onSwapItem(moveX, moveY);
         
         //GridView自动滚动
@@ -329,25 +529,47 @@ public class DragGridView extends GridView{
         
         @Override
         public void run() {
-            int scrollY;
-            if(moveY > mUpScrollBorder){
-                 scrollY = -speed;
-                 mHandler.postDelayed(mScrollRunnable, 25);
-            }else if(moveY < mDownScrollBorder){
-                scrollY = speed;
-                 mHandler.postDelayed(mScrollRunnable, 25);
+            if(SCROLL_VERTICAL){
+                int scrollY;
+                if(moveY > mUpScrollBorder){
+                     scrollY = -speed;
+                     mHandler.postDelayed(mScrollRunnable, 25);
+                }else if(moveY < mDownScrollBorder){
+                    scrollY = speed;
+                     mHandler.postDelayed(mScrollRunnable, 25);
+                }else{
+                    scrollY = 0;
+                    mHandler.removeCallbacks(mScrollRunnable);
+                }
+                
+                //当我们的手指到达GridView向上或者向下滚动的偏移量的时候，可能我们手指没有移动，但是DragGridView在自动的滚动
+                //所以我们在这里调用下onSwapItem()方法来交换item
+                onSwapItem(moveX, moveY);
+                
+                View view = getChildAt(mDragPosition - getFirstVisiblePosition());
+                //实现GridView的自动滚动
+//                Log.i(TAG, "mScrollRunnable~~~~~~~ mDragPosition："+mDragPosition+" view.getTop():"+view.getTop()
+//                        +" scrollY:"+scrollY+" moveY:"+moveY);
+                smoothScrollToPositionFromTop(mDragPosition, view.getTop() + scrollY);
             }else{
-                scrollY = 0;
-                mHandler.removeCallbacks(mScrollRunnable);
+                int scrollX;
+                if(moveX > mRightScrollBorder){
+                    scrollX = -speed;
+                }else if(moveX < mLeftScrollBorder){
+                    scrollX = speed;
+                }else{
+                    scrollX = 0;
+                    mHandler.removeCallbacks(mScrollRunnable);
+                }
+                //当我们的手指到达GridView向上或者向下滚动的偏移量的时候，可能我们手指没有移动，但是DragGridView在自动的滚动
+                //所以我们在这里调用下onSwapItem()方法来交换item
+                onSwapItem(moveX, moveY);
+                View view = getChildAt(mDragPosition - getFirstVisiblePosition());
+//                Log.i(TAG, "mScrollRunnable~~~~~~~ mDragPosition："+mDragPosition+" view.getLeft():"+view.getLeft()
+//                        +" scrollX:"+scrollX+" moveX:"+moveX);
+                //if(scrollX < 0)
+                    //smoothScrollToPosition(mDragPosition,2);
             }
-            
-            //当我们的手指到达GridView向上或者向下滚动的偏移量的时候，可能我们手指没有移动，但是DragGridView在自动的滚动
-            //所以我们在这里调用下onSwapItem()方法来交换item
-            onSwapItem(moveX, moveY);
-            
-            View view = getChildAt(mDragPosition - getFirstVisiblePosition());
-            //实现GridView的自动滚动
-            smoothScrollToPositionFromTop(mDragPosition, view.getTop() + scrollY);
         }
     };
     
@@ -371,6 +593,8 @@ public class DragGridView extends GridView{
             }
             
             mDragPosition = tempPosition;
+            if(SHOW_DROP_LOCATION)
+                swapDropLocationView(); //add by lilei
         }
     }
     
@@ -410,7 +634,7 @@ public class DragGridView extends GridView{
     
     /**
      * 
-     * @author xiaanming
+     * @author 声明回调接口
      *
      */
     public interface OnChanageListener{
@@ -424,4 +648,66 @@ public class DragGridView extends GridView{
          */
         public void onChange(int form, int to);
     }
+    //add by lilei begin
+    OnDragListener mOnDragListener;
+    public void setOnDragListener(OnDragListener onDragListener){
+        mOnDragListener = onDragListener;
+    }
+    
+    public interface OnDragListener{
+        /***
+         * 开始拖拽View
+         * @param view
+         * @param x  view 的x坐标
+         * @param y  view 的y坐标
+         */
+        public void onDragStart(View view,int x,int y);
+        public void onDragMove(View view,int x,int y);
+        public void onDragEnd(View view,int x,int y);
+        public void onChangePage(int from,int to);
+        public void onShowDropLocationView(View locationView,int x,int y);
+        public void onHideDropLocationView(View locationView);
+    }
+    
+    //test longclick begin
+    private GestureDetector mGestureDetector;
+    private class DrapGestureListener extends SimpleOnGestureListener {
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                float distanceX, float distanceY) {
+//            Log.i(TAG,"#######DrapGestureListener.onScroll e1.getX():"+e1.getX()
+//                    +" e2.getX():"+e2.getX()+" distanceX:"+distanceX);
+            // TODO Auto-generated method stub
+            return super.onScroll(e1, e2, distanceX, distanceY);
+        }
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                float velocityY) {
+            // TODO Auto-generated method stub
+            Log.i(TAG,"#######DrapGestureListener.onFling e1.getX():"+e1.getX()
+                    +" e2.getX():"+e2.getX()+" velocityX:"+velocityX);
+            return true;
+        }
+        @Override
+        public void onLongPress(MotionEvent e) {
+            Log.i(TAG,"#######DrapGestureListener.onLongPress ");
+            mHandler.postDelayed(mLongClickRunnable, 0);
+            super.onLongPress(e);
+        }
+        @Override
+        public boolean onDown(MotionEvent e) {
+//            Log.i(TAG,"#######DrapGestureListener.onDown ~~~");
+            return true;
+        }
+    }
+
+    //add by lilei end
+
+    @Override
+    public boolean onLongClick(View arg0) {
+        // TODO Auto-generated method stub
+        Log.i(TAG, "######### onLongClick view:"+arg0);
+        return false;
+    }
+
 }

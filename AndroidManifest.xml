@@ -17,6 +17,7 @@
         android:targetSdkVersion="19" />
 
     <application
+        android:name="com.android.daka.launcher.LauncherApplication"
         android:theme="@android:style/Theme.Holo.Light"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"

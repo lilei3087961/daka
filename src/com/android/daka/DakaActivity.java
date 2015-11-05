@@ -1,22 +1,18 @@
 package com.android.daka;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import com.android.daka.adapters.MyAdapters;
 import com.android.daka.fragments.DragGridFragment;
+import com.android.daka.fragments.DragListFragment;
 import com.android.daka.fragments.MainFragment;
 import com.android.daka.fragments.MyFragments;
 import com.android.daka.utils.ActivityUtils;
+import com.android.daka.utils.SystemUtils;
 
-import java.io.DataInputStream;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,9 +26,11 @@ public class DakaActivity extends Activity {
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.i(TAG, "onCreate()----");
+		Log.i(TAG, "onCreate() 111 ");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_daka);
+		SystemUtils.initContext(this);
+		//MainFragment 
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new DragGridFragment()).commit();
