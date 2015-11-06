@@ -11,15 +11,22 @@ import android.graphics.Bitmap;
 
 import com.android.daka.Config;
 import com.android.daka.R;
+import com.android.daka.launcher.AllAppsList;
+import com.android.daka.launcher.ApplicationInfo;
+import com.android.daka.launcher.ApplicationManager;
 import com.android.daka.launcher.LauncherApplication;
+import com.android.daka.utils.BitmapUtils;
 import com.android.daka.views.DragGridView;
 import com.android.daka.views.DragGridView.OnChanageListener;
 import com.android.daka.views.DragGridView.OnDragListener;
 
 import android.app.Fragment;
+import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -44,6 +51,13 @@ public class DragGridFragment extends Fragment {
     private static final boolean SCROLL_VERTICAL = DragGridView.SCROLL_VERTICAL; //是否纵向滚动
     public static int pageCount = 2;
     private int mCurrentPage = 0;
+    private static final HandlerThread sWorkerThread = new HandlerThread("daka-loader");
+    static {
+        sWorkerThread.start();
+    }
+    public static final Handler sWorker = new Handler(sWorkerThread.getLooper());
+    public static final Handler mHandler = new Handler();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -54,14 +68,43 @@ public class DragGridFragment extends Fragment {
             rootView = inflater.inflate(R.layout.draggrid_fragment_horizontal,container,false);
         }
         mRootView = (ViewGroup) rootView;
-        getAllAppListForTestPages();
-        initView(0);
+        
+        if(mLauncherApplication == null)
+            mLauncherApplication = (LauncherApplication)getActivity().getApplication();
+        Log.i(TAG,"onCreateView 111");
+        sWorker.post(new RunnableWaitLoad());
+        Log.i(TAG,"onCreateView 222");
+//        getAllAndroidAppToList();
+//        getAllAppListForTestPages();
+//        initView(0);
         return rootView;
         //return super.onCreateView(inflater, container, savedInstanceState);
     }
-    public void getAllAppList(){
-        //if(mLauncherApplication == null)
-            //mLauncherApplication = (LauncherApplication)getApplication();
+    public class RunnableWaitLoad implements Runnable{
+
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            Log.i(TAG,"RunnableWaitLoad 111");
+            while(ApplicationManager.getLoadStatus() != true){
+                try {
+                    Thread.sleep(500);  //500ms
+                } catch (InterruptedException unused) {
+                }
+            }
+            Log.i(TAG,"RunnableWaitLoad 222");
+            getAllAppPages();
+            //getAllAppPagesTest();
+            mHandler.post(new Runnable(){
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                    initView(0);
+                }
+            });
+
+        }
+        
     }
     public void getAllAppListForTest(){
         mAllAppList.clear();
@@ -77,25 +120,12 @@ public class DragGridFragment extends Fragment {
             mAllAppList.add(itemHashMap);
         }
     }
-    public void getAllAppListForTestPages(){
-        pageCount = 2;
-        int lineCount = 3;
-        mPages.clear();
-//        List<Map<String, Object>> mpageAppList;
-        //Map<String, Object> itemHashMap;
-        for(int i=0;i<pageCount;i++){
-            List<Map<String, Object>> mpageAppList = new ArrayList<Map<String, Object>>();
-            for(int j=0;j<lineCount;j++){
-                Map<String, Object> itemHashMap = new HashMap<String, Object>();
-                itemHashMap.put("item_image",R.drawable.ic_launcher);
-                itemHashMap.put("item_text", "拖拽 " + i+""+j);
-                mpageAppList.add(itemHashMap);
-            }
-            mPages.add(mpageAppList);
-        }
-        
-    }
-    
+
+    /***
+     * 初始化指定page的图标信息到界面
+     * init page views
+     * @param page
+     */
     void initView(int page){
         mCurrentPage = page;
         Log.i(TAG, "~~~~ initView 11 mPages.size():"+mPages.size()+" page:"+page);
@@ -215,10 +245,18 @@ public class DragGridFragment extends Fragment {
         });
 
     }
-    //add by lilei begin
+
     ImageView mImageView;
     View mDragView;
     FrameLayout.LayoutParams mViewGroupLayoutParams;
+    /***
+     * 显示悬浮view到指定位置，
+     * @param context
+     * @param view
+     * @param x
+     * @param y
+     * @param index 层级 -1层级最大
+     */
     public void showViewInPosition(Context context,View view,int x,int y,int index){
         if(mViewGroupLayoutParams == null){
             mViewGroupLayoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
@@ -228,26 +266,30 @@ public class DragGridFragment extends Fragment {
         //mRootView.addView(view,mViewGroupLayoutParams);
         mRootView.addView(view, index, mViewGroupLayoutParams);
     }
+    /***
+     * 移动 view 到指定的位置
+     * @param view
+     * @param x
+     * @param y
+     */
     public void moveDragImage(View view,int x,int y){
         view.setTranslationX(x);
         view.setTranslationY(y);
     }
+    /***
+     * 移出弹出的view
+     * @param view
+     */
     public void removeAddedView(View view){
         mRootView.removeView(view);
     }
-    public void showImage(Context context){
-        mImageView = new ImageView(context);
-        mImageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_launcher));
-        Log.i(TAG, "showImage mRootView.getLayoutParams():"+mRootView.getLayoutParams());
-        if(mViewGroupLayoutParams == null){
-            mViewGroupLayoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-            mViewGroupLayoutParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
-        }
-        mRootView.addView(mImageView,mViewGroupLayoutParams);
-    }
-    //add by lilei end
+
     //for test begin
-    //将draggrid_fragment_horizontal.xml 中的com.android.daka.views.DragGridView改成GridView测试
+    /***
+     * 单页面测试，未使用
+     * 将draggrid_fragment_horizontal.xml 中的com.android.daka.views.DragGridView改成GridView测试
+     * @param rootView
+     */
     void initViewTestGridView(View rootView){
         getAllAppListForTest();
         GridView mDragGridView = (GridView) rootView.findViewById(R.id.dragGridView);
@@ -288,8 +330,82 @@ public class DragGridFragment extends Fragment {
         
         
 
-        //add by lilei end
+
     }
-    //for test end
+    //add by lilei end
+    final String KEY_PACKAGE = "packageName";
+    final String KEY_CLASS = "className";
+    /***
+     * 通过Bitmap图片资源(android应用图标),获取图标，标题信息到mPages
+     * 
+     */
+    public void getAllAppPages(){
+        final ArrayList<ApplicationInfo> list = (ArrayList<ApplicationInfo>)mLauncherApplication.mModel.getAllAppInfo().data.clone();
+        HashMap<String,String> mapName = null;
+        List<HashMap<String,String>> listName = new ArrayList<HashMap<String,String>>();
+        Log.i(TAG,"getAllAppPages 111 app size:"+list.size());
+        for(int i=0;i< list.size();i++){
+            if(list.get(i)!=null){
+                String packageName = list.get(i).componentName.getPackageName();
+                String className = list.get(i).componentName.getClassName();
+                Log.i(TAG,">>getAllAndroidAppToList>>packageName:"+packageName+" className:"+className);
+                mapName = new HashMap<String,String>();
+                mapName.put(KEY_PACKAGE, packageName);
+                mapName.put(KEY_CLASS, className);
+                listName.add(mapName);
+            }
+        }
+        Log.i(TAG,"getAllAppPages 222 listName.size():"+listName.size());
+        int index=0;
+        pageCount = 2;
+        int lineCount = 3;
+        mPages.clear();
+        Bitmap appIcon = null;
+        String title = "error";
+        ComponentName componentName;
+        String packageName;
+        String className;
+        for(int i=0;i<pageCount;i++){
+            List<Map<String, Object>> mpageAppList = new ArrayList<Map<String, Object>>();
+            for(int j=0;j<lineCount;j++){
+                Map<String, Object> itemHashMap = new HashMap<String, Object>();
+                if(mLauncherApplication.getIconCache() != null){
+                    packageName = listName.get(index).get(KEY_PACKAGE);
+                    className = listName.get(index).get(KEY_CLASS); 
+                    index++;
+                    componentName =  new ComponentName(packageName,className);
+                    appIcon = mLauncherApplication.getIconCache().getComponentIcon(componentName);
+                    appIcon = BitmapUtils.resizeBitmap(appIcon, 72, 72);
+                    title = mLauncherApplication.getIconCache().getApplicationTitle(componentName);
+                }
+                Log.i(TAG,"getAllAppPages title:"+title+" appIcon:"+appIcon);
+                itemHashMap.put("item_image",appIcon);
+                itemHashMap.put("item_text", title);
+                mpageAppList.add(itemHashMap);
+            }
+            mPages.add(mpageAppList);
+        }
+        
+    }
+    /***
+     * 通过drawable图片资源(机器人图标),获取图标，标题信息到mPages
+     */
+    public void getAllAppPagesTest(){
+        pageCount = 2;
+        int lineCount = 3;
+        mPages.clear();
+        for(int i=0;i<pageCount;i++){
+            List<Map<String, Object>> mpageAppList = new ArrayList<Map<String, Object>>();
+            for(int j=0;j<lineCount;j++){
+                Map<String, Object> itemHashMap = new HashMap<String, Object>();
+                itemHashMap.put("item_image",R.drawable.ic_launcher);
+                itemHashMap.put("item_text", "拖拽 " + i+""+j);
+                mpageAppList.add(itemHashMap);
+            }
+            mPages.add(mpageAppList);
+        }
+        
+    }
+
     
 }

@@ -69,7 +69,7 @@ public class LauncherApplication extends Application {
     }
 
 
-    IconCache getIconCache() {
+    public IconCache getIconCache() {
         return mIconCache;
     }
 

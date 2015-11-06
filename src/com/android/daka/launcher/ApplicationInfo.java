@@ -30,7 +30,7 @@ import java.util.HashMap;
 /**
  * Represents an app in AllAppsView.
  */
-class ApplicationInfo extends ItemInfo {
+public class ApplicationInfo extends ItemInfo {
     private static final String TAG = ">>lilei>>ApplicationInfo";
 
     /**
@@ -48,7 +48,7 @@ class ApplicationInfo extends ItemInfo {
      */
     long firstInstallTime;
 
-    ComponentName componentName;
+    public ComponentName componentName;
 
     static final int DOWNLOADED_FLAG = 1;
     static final int UPDATED_SYSTEM_APP_FLAG = 2;

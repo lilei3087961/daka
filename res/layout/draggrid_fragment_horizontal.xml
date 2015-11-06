@@ -3,26 +3,27 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" > 
+    android:layout_height="wrap_content" > 
 
    <com.android.daka.views.DragHorizontalScrollView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
         android:layout_margin="5dp" >
     <LinearLayout
       android:background="#ff0000"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp" >
     <com.android.daka.views.DragGridView
         android:id="@+id/dragGridView"
         android:listSelector="@android:color/transparent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:padding="5dip"
+        android:layout_height="wrap_content"
         android:cacheColorHint="@android:color/transparent"
-        android:verticalSpacing="10dip"
-        android:horizontalSpacing="10dip"
+        android:verticalSpacing="0dip"
+        android:horizontalSpacing="0dip"
         android:stretchMode="columnWidth"  
         android:gravity="center" 
         android:numColumns="auto_fit" >

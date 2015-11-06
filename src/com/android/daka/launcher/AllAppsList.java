@@ -32,7 +32,7 @@ import android.util.Log;
 /**
  * Stores the list of all applications for the all apps view.
  */
-class AllAppsList {
+public class AllAppsList {
     public static final int DEFAULT_APPLICATIONS_NUMBER = 42;
     private static final String TAG = "AllAppsList";
     /** The list off all apps. */

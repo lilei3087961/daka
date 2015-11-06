@@ -370,7 +370,7 @@ public class DragGridView extends GridView implements OnLongClickListener{
         }
 //        Log.i(TAG,"dispatchTouchEvent ev.getAction():"+parseAction(ev));
         boolean flag = super.dispatchTouchEvent(ev); 
-        //Log.i(TAG," flag:"+flag);
+        Log.i(TAG," flag:"+flag);
         return flag;
     }
 
