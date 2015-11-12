@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
+<!-- android:background="#ff0000" -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -9,12 +9,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
-        android:layout_margin="5dp" >
+        android:layout_margin="0dip" >
     <LinearLayout
-      android:background="#ff0000"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp" >
+            android:layout_margin="0dip" >
     <com.android.daka.views.DragGridView
         android:id="@+id/dragGridView"
         android:listSelector="@android:color/transparent"

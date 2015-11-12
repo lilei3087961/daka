@@ -33,7 +33,6 @@
     >
 		 <LinearLayout
 	        android:background="#ff00ff00"
-
 	        android:layout_width="match_parent"
 	    	android:layout_height="match_parent"
 	    	android:orientation="horizontal" >
@@ -66,9 +65,4 @@
 	        />
     </LinearLayout>
     
-	<Button 
-	        android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="编辑工具应用"
-	    />
 </LinearLayout>

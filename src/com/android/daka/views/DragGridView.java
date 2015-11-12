@@ -39,7 +39,7 @@ import android.view.View.OnLongClickListener;
  */
 @SuppressLint("NewApi")
 public class DragGridView extends GridView implements OnLongClickListener{
-    final boolean SHOW_DROP_LOCATION = false; //是否显示占位图标轮廓
+    final boolean SHOW_DROP_LOCATION = true; //是否显示占位图标轮廓
     public static final boolean SCROLL_VERTICAL = false; //是否纵向滚动
     public static final boolean HORIZONTAL_LONG = false; //首先 SCROLL_VERTICAL为false，其次 水平图标个数要很多才能设置为true(未实现)
     /**
@@ -210,9 +210,10 @@ public class DragGridView extends GridView implements OnLongClickListener{
         if(mDropLocationImageView == null)
             createDropLocationView();
         View view = getChildAt(mDragPosition - getFirstVisiblePosition());
-        float x = view.getX();
+        float x = view.getX();//x 是相对屏幕左边的位置
         float y = view.getY();
-        Log.i(TAG, "showDropLocationView view.getX():"+view.getX()+" view.getY():"+view.getY());
+        Log.i(TAG, "showDropLocationView view.getX():"+view.getX()+" view.getY():"+view.getY()
+                + " view.getLeft():"+view.getLeft());
         mOnDragListener.onShowDropLocationView(mDropLocationImageView, (int)x, (int)y);
     }
     private void hideDropLocationView(){

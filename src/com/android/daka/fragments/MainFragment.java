@@ -78,10 +78,6 @@ public class MainFragment extends Fragment {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 	             //ShellUtils.test();
-			    showImage(getActivity());
-			    //FileUtils.test(getActivity());
-			    if(true)
-			        return;
 			    if(mMyDbHelper.addOnWork()){
 			        updateListView();
 			    }else{
@@ -95,9 +91,6 @@ public class MainFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-			    moveImage();
-			    if(true)
-                    return;
 			    if(mMyDbHelper.addOffWork()){
 				    updateListView();
 			    }else{

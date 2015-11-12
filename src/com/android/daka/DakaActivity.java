@@ -30,7 +30,7 @@ public class DakaActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_daka);
 		SystemUtils.initContext(this);
-		//MainFragment 
+		//MainFragment,DragGridFragment
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new DragGridFragment()).commit();
@@ -117,6 +117,5 @@ public class DakaActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	
 
 }
