@@ -345,9 +345,9 @@ public class ApplicationManager extends BroadcastReceiver {
                     final String packageName = apps.get(i).activityInfo.applicationInfo.packageName;
 
                     ComponentName componentName = new ComponentName(packageName, apps.get(i).activityInfo.name);
-                    Log.v(TAG, "test>>>>>mIconCache title is:"
-                            +mIconCache.getApplicationTitle(componentName)
-                            +" >>mLabelCache title is:"+mLabelCache.get(componentName));
+//                    Log.v(TAG, "test>>>>>mIconCache title is:"
+//                            +mIconCache.getApplicationTitle(componentName)
+//                            +" >>mLabelCache title is:"+mLabelCache.get(componentName));
                     //add by lilei fortest end `
                     i++;
                 }

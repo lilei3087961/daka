@@ -11,6 +11,7 @@ import com.android.daka.utils.ActivityUtils;
 import com.android.daka.utils.FileUtils;
 import com.android.daka.utils.ReflectionUtils;
 import com.android.daka.utils.ShellUtils;
+import com.android.daka.utils.SortUtils;
 import com.android.daka.utils.SystemUtils;
 
 import android.annotation.SuppressLint;
@@ -78,6 +79,9 @@ public class MainFragment extends Fragment {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 	             //ShellUtils.test();
+			    SortUtils.getInstance().test();
+			    if(true)
+			        return;
 			    if(mMyDbHelper.addOnWork()){
 			        updateListView();
 			    }else{

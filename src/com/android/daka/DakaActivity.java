@@ -33,7 +33,7 @@ public class DakaActivity extends Activity {
 		//MainFragment,DragGridFragment
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-					.add(R.id.container, new DragGridFragment()).commit();
+					.add(R.id.container, new MainFragment()).commit();
 		}
 		ActivityUtils mActivityUtils = new ActivityUtils(this);
 //		mActivityUtils.getRunningAppProcesses();
